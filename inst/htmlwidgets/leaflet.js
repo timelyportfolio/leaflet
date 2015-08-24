@@ -1483,9 +1483,26 @@ var dataframe = (function() {
     initialize: function(el, width, height) {
       // hard-coding center/zoom here for a non-empty initial view, since there
       // is no way for htmlwidgets to pass initial params to initialize()
+
+      // CRS can only be added at instantiation, but initialize is
+      //   not provided with x
+      //   so this hack gets x to see if there is a CRS projection defined
+      var x = JSON.parse(document.querySelector("script[data-for='" + el.id + "'][type='application/json']").textContent).x;
+      var crs = x.crs ? x.crs : 'EPSG3857'; //EPSG3857 is default for leaflet
+      // confirm that crs is one of Leaflet's predefined projections
+      if(crs !== null){
+        if(Object.keys(L.CRS).indexOf(crs) < 0){
+          crs = null;
+        } else {
+          // don't think I can get around the evil eval here
+          crs = eval(L.CRS[crs]);
+        }
+      }
+
       var map = L.map(el, {
         center: [51.505, -0.09],
-        zoom: 13
+        zoom: 13,
+        crs: crs
       });
 
       preventUnintendedZoomOnScroll(map);
