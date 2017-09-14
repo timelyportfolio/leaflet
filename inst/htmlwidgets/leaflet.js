@@ -1175,7 +1175,9 @@ exports.default = methods;
 function mouseHandler(mapId, layerId, group, eventName, extraInfo) {
   return function (e) {
     if (!_htmlwidgets2.default.shinyMode) return;
-
+ 
+    L.DomEvent.stop(e);
+    
     var eventInfo = _jquery2.default.extend({
       id: layerId,
       ".nonce": Math.random() // force reactivity
